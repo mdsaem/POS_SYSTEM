@@ -29,13 +29,15 @@ class UsersController extends Controller
 	public function create()
 
 	{
-		$this->data['groups']=group::arrayForSelect();
+		$this->data['groups']   =   group::arrayForSelect();
+		$this->data['mode']     =   'create';
+		$this->data['headline'] =  'Add New User';
 	   /* $groups=group::all();
 		$this->data['groups']=[];
 		foreach ($groups as  $group) {
 			$this->data['groups'][$group->id]=$group->title;*/
 		
-		return view('user.create',$this->data);
+		return view('user.form',$this->data);
 	}
 
 	/**
@@ -48,40 +50,36 @@ class UsersController extends Controller
 	{
 		$request->validate([
              'group_id' => 'required',
-            'name' => 'required|string',
-            'phone' => 'required|numeric|unique:users',
-            'email' => 'nullable|email|unique:users',
+            'name'      => 'required|string',
+            'phone'     => 'required|numeric|unique:users',
+            'email'     => 'nullable|email|unique:users',
 
 		]);
 
 	     $data=$request->all();
          if (User::create($data)) {
-         	Session::flash('message', 'Group create Successfully');
+         	Session::flash('message', 'User create Successfully');
          }
         
     	return redirect()->to('users');
 }
 
-	/**
-	 * Display the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return \Illuminate\Http\Response
-	 */
-	public function show($id)
+
+public function show($id)
 	{
-		//
+		$this->data['users']= User::find($id);
+	
+		return view('user.show',$this->data);
 	}
 
-	/**
-	 * Show the form for editing the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return \Illuminate\Http\Response
-	 */
+
 	public function edit($id)
 	{
-		//
+		$this->data['users']= User::findOrFail($id);
+		$this->data['groups']=group::arrayForSelect();
+		$this->data['mode']='edit';
+		$this->data['headline']='update Information';
+		return view('user.form',$this->data);
 	}
 
 	/**
@@ -93,7 +91,21 @@ class UsersController extends Controller
 	 */
 	public function update(Request $request, $id)
 	{
-		//
+		$data =  $request->all();
+		$users = User::find($id);
+		$users->group_id = $data['group_id'];
+		$users->name = $data['name'];
+		$users->email = $data['email'];
+		$users->phone = $data['phone'];
+		$users->address = $data['address'];
+
+
+
+		if ($users->save()) {
+         	Session::flash('message', 'User Update Successfully');
+         }
+        
+    	return redirect()->to('users');
 	}
 
 	/**
@@ -104,6 +116,12 @@ class UsersController extends Controller
 	 */
 	public function destroy($id)
 	{
-		//
+		
+         if (User::find($id)->delete()) {
+         	Session::flash('message', 'User Delete Successfully');
+         }
+        
+    	return redirect()->to('users');
 	}
+
 }

@@ -11,7 +11,7 @@
         </ul>
     </div>
 @endif
-<h2>Create new Group</h2>
+		<h2>{{$headline}}</h2>
 
         <div class="card shadow mb-4">
 	            <div class="card-header py-3">
@@ -20,10 +20,18 @@
         <div class="card-body">
         	<div class="row justify-content-md-center">
         		<div class="col-md-6">
-        			{!! Form::open(['route' => 'users.store', 'method' => 'post']) !!}
-        		
-				
+        	
+        			 @if($mode == 'edit')
 
+        		 {!! Form::model($users, ['route' =>['users.update',$users->id] , 'method' => 'put']) !!}
+
+        		 @else
+        		 {!! Form::open(['route' => 'users.store', 'method' => 'post']) !!}
+
+        		@endif
+
+        		
+        		
 				   <div class="form-group row">
 					    <label for="name" class="col-sm-3 col-form-label">User Group <span class="text-danger">*</span> </label>
 					    <div class="col-sm-9">

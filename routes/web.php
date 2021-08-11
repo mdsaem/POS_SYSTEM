@@ -26,7 +26,10 @@ Route::delete('groups/{id}', 'App\Http\Controllers\UserGroupController@destroy')
 //Route::get('users','App\Http\Controllers\UsersController@index');
 
 //Users
-Route::resource('users', 'App\Http\Controllers\UsersController', ['except' => ['show'] ]); //jeta bad tite hobe tar code ['except'=>['show'] ]
+Route::resource('users', 'App\Http\Controllers\UsersController'); //jeta bad tite hobe tar code ['except'=>['show'] ]
+Route::resource('categories','App\Http\Controllers\CategoriesController',['except'=>['show']]); 
+Route::resource('products','App\Http\Controllers\ProductsController'); 
+//jeta bad tite hobe tar code ['except'=>['show'] ]
 
 
 /*Route::get('users', 'App\Http\Controllers\UsersController@index');

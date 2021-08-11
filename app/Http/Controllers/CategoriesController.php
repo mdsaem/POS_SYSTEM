@@ -1,12 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Product;
-use App\Models\Category;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Http\Request;
 
-class ProductsController extends Controller
+use Illuminate\Http\Request;
+use App\Models\Category;
+use App\Models\Group;
+use Illuminate\Support\Facades\Session;
+
+class CategoriesController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,9 +16,9 @@ class ProductsController extends Controller
      */
     public function index()
     {
-        $this->data['products'] = Product::all();
+        $this->data['categories'] = Category::all();
 
-        return view('products.products',$this->data);
+        return view('category.categories',$this->data);
     }
 
     /**
@@ -27,12 +28,11 @@ class ProductsController extends Controller
      */
     public function create()
     {
-        $this->data['categories']   = Category::arrayForSelect();
-        $this->data['mode']         = 'create';
-        $this->data['headline']     = 'Add New Product';
-
-        return view('products.form', $this->data);
+         $this->data['headline'] = 'Add New Category';
+         $this->data['mode'] = 'create';
+        return view('category.form',$this->data);
     }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -40,21 +40,22 @@ class ProductsController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {  
+    {
+
         $request->validate([
-             'category_id' => 'required',
-            'title'      => 'string|required',
-           'cost_price'     => 'nullable|numeric',
-            'price'     => 'nullable|numeric',
+             
+          'title'      => 'required|string',
+          
 
         ]);
+            
+            $data = $request->all();
 
-        $data=$request->all();
+            if (Category::create($data)) {
+                Session::flash('message','Category Create Successfully');
+            }
 
-        if (Product::create($data)) {
-            Session::flash('message','Product Create success');
-        }
-        return redirect()->to('products');
+            return redirect()->to('categories');
     }
 
     /**
@@ -65,9 +66,7 @@ class ProductsController extends Controller
      */
     public function show($id)
     {
-        $this->data['products'] = Product::find($id);
-
-        return view('products.show',$this->data);
+        //
     }
 
     /**
@@ -78,7 +77,11 @@ class ProductsController extends Controller
      */
     public function edit($id)
     {
-        //
+        $this->data['categories']= Category::findOrFail($id);
+        $this->data['groups']=group::arrayForSelect();
+        $this->data['mode']='edit';
+        $this->data['headline']='update Information';
+        return view('category.form',$this->data);
     }
 
     /**
@@ -90,7 +93,15 @@ class ProductsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $data =  $request->all();
+        $categories = Category::find($id); 
+        $categories->title = $data['title'];
+   
+        if ($categories->save()) {
+            Session::flash('message', 'Category Update Successfully');
+         }
+        
+        return redirect()->to('categories');
     }
 
     /**
@@ -101,6 +112,10 @@ class ProductsController extends Controller
      */
     public function destroy($id)
     {
-        //
+       ;
+       if (Category::find($id)->delete()) {
+            Session::flash('message', 'Category Delete Successfully');
+         }
+         return redirect()->to('categories');
     }
 }
